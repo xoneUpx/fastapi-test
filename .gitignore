@@ -1,0 +1,10 @@
+**/.direnv
+**/.nox
+**/.venv
+**/.envrc
+**/.env
+**/.terraform*
+**/backend.tf
+**/providers.tf
+runner/
+runner.sh

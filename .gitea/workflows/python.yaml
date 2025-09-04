@@ -1,0 +1,45 @@
+name: Python package
+
+on: [push]
+
+jobs:
+  build:
+    #runs-on: ubuntu-latest
+    runs-on: test
+      #strategy:
+      #matrix:
+      #  python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+
+    steps:
+      #- uses: actions/checkout@v3
+      # fix for subpath issue
+      - uses: ischanx/checkout@06c611454073903c9d44641d7e085b21115d3dcf
+        #- name: Set up Python ${{ matrix.python-version }}
+        #uses: actions/setup-python@v4
+        #with:
+          #python-version: ${{ matrix.python-version }}
+          #  python-version: "3.11.4"
+          #cache: "pip"
+          #env:
+          #AGENT_TOOLSDIRECTORY: /opt/hostedtoolcache
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install poetry
+          poetry check
+          poetry install --only dev
+          #if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          #- name: Run linters
+          #uses: wearerequired/lint-action@v1
+          #with:
+          #black: true
+          #flake8: true
+      - name: Lint with black
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          poetry run black  .
+          poetry run mypy --install-types --non-interactive .
+          poetry run flake8 .
+      - name: Test with pytest
+        run: |
+          poetry run pytest

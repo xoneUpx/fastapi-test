@@ -1,0 +1,30 @@
+services:
+  app:
+    #image: astral-sh/uv:latest
+    build:
+      dockerfile: Dockerfile-uv
+    ports:
+    - 8000:8000
+    volumes:  
+    - ./src:/app/src
+    env_file:
+    - .env
+    environment:
+    - PYTHONPATH=/app/src
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+    # entrypoint is uv
+    command:  uv run fastapi dev main.py --host 0.0.0.0 --port 8000 --reload
+
+#    command:
+#    - python
+#    - -m
+#    - uvicorn
+#    - src.app.main:app
+#    - --host
+#    - 0.0.0.0
+#    - --port
+#    - "8000"
+#    - --reload
+#
+#

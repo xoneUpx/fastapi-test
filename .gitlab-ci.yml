@@ -1,0 +1,34 @@
+include:
+  - template: Jobs/Secret-Detection.gitlab-ci.yml
+stages:
+  - security
+  - build
+
+gitleaks:
+  stage: security
+  image:
+    name: zricethezav/gitleaks
+    entrypoint: [""]
+  script:
+    - gitleaks detect --source . --verbose
+
+variables:
+  UV_VERSION: "0.5"
+  PYTHON_VERSION: "3.12"
+  BASE_LAYER: bookworm-slim
+  # GitLab CI creates a separate mountpoint for the build directory,
+  # so we need to copy instead of using hard links.
+  UV_LINK_MODE: copy
+
+uv:
+  parallel:
+    # generates cartesian product, see: https://docs.gitlab.com/ci/yaml/#parallelmatrix
+    matrix:
+      - VAR: ['8.0', '8.1']
+        VAR2: "test"
+      - VAR: ['8.2', '8.4]
+        VAR2: "test2"
+  stage: build
+  image: ghcr.io/astral-sh/uv:$UV_VERSION-python$PYTHON_VERSION-$BASE_LAYER
+  script:
+    # your `uv` commands

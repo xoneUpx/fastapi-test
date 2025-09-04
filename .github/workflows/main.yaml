@@ -1,0 +1,192 @@
+# https://github.com/marketplace/actions/gotify-notification
+# # https://github.com/marketplace/actions/ntfy_action
+name: chat
+on:
+  workflow_dispatch:
+    inputs:
+      TEST:
+        description: "A random input name for the workflow"
+        type: string
+jobs:
+  test:
+    name: test
+    #runs-on: node:lts-slim
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test with inputs
+        run: |
+          echo "Hello ${{ github.event.inputs.TEST }} !"
+          echo "Hello ${{ secrets.TEST }} !"
+
+  lint:
+    runs-on: ubuntu-latest
+    name: ruff test
+    steps:
+      - name: ✨ Lint with Ruff
+        run: |
+          uv run ruff check src
+          uv run ruff format --check src
+
+  build:
+    name: continuous-integration
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version:
+          - "3.10"
+          - "3.11"
+          - "3.12"
+          - "3.13"
+
+    steps:
+      - name: Register the personal access token
+        run: echo "${{ secrets.MY_PAT }}" | gh auth login --with-token
+      - name: Configure the Git credential helper
+        run: gh auth setup-git
+
+      - uses: actions/checkout@v4
+      - name: Install uv and set the python version
+        uses: astral-sh/setup-uv@v6
+        with:
+          # python-version-file: "pyproject.toml"
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install the project
+        run: uv sync --locked --all-extras --dev
+
+      - name: Run tests
+        # For example, using `pytest`
+        run: uv run pytest tests
+kkk
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint code
+        run: pnpm run lint
+
+      - name: Run tests
+        run: pnpm run test
+
+      - name: Build packages
+        run: pnpm run build
+
+      - name: Check for build artifacts
+        run: |
+          for package in packages/*/dist; do
+            if [ ! -d "$package" ]; then
+              echo "Build artifact missing: $package"
+              exit 1
+            fi
+          done
+      - name: Gotify Notification
+        uses: eikendev/gotify-action@master
+        with:
+          gotify_api_base: '${{ secrets.gotify_api_base }}'
+          gotify_app_token: '${{ secrets.gotify_app_token }}'
+          notification_title: 'Build Complete'
+          notification_message: 'Your build was completed.'
+      - name: ntfy-success-notifications
+        uses: niniyas/ntfy-action@master
+        if: success()
+        with:
+          url: 'https://ntfy.sh' or '${{ secrets.NTFY_URL }}'
+          topic: 'test' or '${{ secrets.NTFY_TOPIC }}'
+          priority: 4
+          headers: '{"authorization": "Basic 123456", "another-one": "Basic 123456"}' or '${{ secrets.NTFY_HEADERS }}'
+          tags: +1,partying_face,action,successfully,completed
+          details: Workflow has been successfully completed!
+
+
+  release:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm build
+
+        # specific to npm releases
+      #- name: Create Release Pull Request or Publish
+      #  id: changesets
+      #  uses: changesets/action@v1
+      #  with:
+      #    publish: pnpm changeset:publish
+      #    title: 'chore: release packages'
+      #    commit: 'chore: release packages'
+      #  env:
+      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #    NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Send Slack notification
+        if: steps.changesets.outputs.published == 'true'
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          text: 'New packages published! 🎉'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+
+#name: CI
+#on: push
+#
+#jobs:
+#  test:
+#    runs-on: node:16-buster-slim
+#    steps:
+#    - uses: actions/checkout@v2
+#    #- uses: actions/setup-node@v1
+#    - run: npm install
+#    - run: npm test

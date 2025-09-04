@@ -1,0 +1,4 @@
+dependencies:
+  python.org@3.13.7 uv vagrant pre-commit
+env:
+  TEST: python-dev
