@@ -1,4 +1,4 @@
-name: Terminus CI/CD
+name: app CI/CD
 
 on:
   push:
@@ -131,7 +131,7 @@ jobs:
           id: meta
           uses: docker/metadata-action@v5
           with:
-            images: ${{ secrets.DOCKERHUB_USERNAME }}/terminus
+            images: ${{ secrets.DOCKERHUB_USERNAME }}/fastapi_app
             tags: |
               type=sha,format=short
               type=raw,value=latest

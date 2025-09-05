@@ -21,6 +21,9 @@ variables:
   UV_LINK_MODE: copy
 
 uv:
+  #tags:
+  #  - saas-linux-small-amd64
+
   parallel:
     # generates cartesian product, see: https://docs.gitlab.com/ci/yaml/#parallelmatrix
     matrix:
@@ -31,4 +34,5 @@ uv:
   stage: build
   image: ghcr.io/astral-sh/uv:$UV_VERSION-python$PYTHON_VERSION-$BASE_LAYER
   script:
+    sync --locked
     # your `uv` commands
