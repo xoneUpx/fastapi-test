@@ -29,7 +29,7 @@ uv:
     matrix:
       - VAR: ['8.0', '8.1']
         VAR2: "test"
-      - VAR: ['8.2', '8.4]
+      - VAR: ['8.2', '8.4']
         VAR2: "test2"
   stage: build
   image: ghcr.io/astral-sh/uv:$UV_VERSION-python$PYTHON_VERSION-$BASE_LAYER
