@@ -35,5 +35,5 @@ uv:
   stage: build
   image: ghcr.io/astral-sh/uv:$UV_VERSION-python$PYTHON_VERSION-$BASE_LAYER
   script:
-    sync --locked
+    uv sync --locked
     # your `uv` commands

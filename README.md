@@ -7,8 +7,10 @@ pre-commit install
 ``` sh { "name": "test module"}
 uv run uvicorn src.main:app
 uv run python3 src/main.py
+
 .venv/bin/fastapi dev src/main.py
-podman login --username $HARBOR_USERNAME --password $HARBOR_PASSWORD https://c8n.io/xoneupx 
+uv run pytest test
+podman login --username $HARBOR_USERNAME --password $HARBOR_PASSWORD https://c8n.io/xoneupx
 
 #### pre-commit installed via pip/uv
 # uv add pre-commit
