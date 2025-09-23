@@ -24,7 +24,7 @@ jobs:
       - name: tests
         run: |
           uv run pytest tests
-          uv run pyright src -verbose
+          uv run pyright src --verbose
           uv run mypy src -v
 
 #  lint:
