@@ -20,7 +20,8 @@ jobs:
           echo "Hello ${{ github.event.inputs.TEST }} !"
           echo "Hello ${{ secrets.TEST }} !"
       - name: 📦 Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v6
+      - name: tests
         run: |
           uv run pytest tests
           uv run pyright src -verbose
