@@ -1,3 +1,6 @@
+**/.*tags*
+**/.*cache*
+**/*__pycache__*
 **/.direnv
 **/.nox
 **/.venv

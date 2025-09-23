@@ -3,6 +3,17 @@ run-name: ${{ gitea.actor }} is testing out Gitea Actions 🚀
 on: [push]
 
 jobs:
+  gitleaks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          #GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE}} # Only required for Organizations, not personal accounts.
+
   Test-Gitea-Actions:
     runs-on: ubuntu-latest
     steps:

@@ -1,5 +1,6 @@
 [project]
 requires-python = ">= 3.13"
+#requires-python = ">=3.13.7"
 name = "fastapi-test"
 version = "0.1.0"
 description = "fastapi test"
@@ -35,42 +36,33 @@ ci = [
     "nox>=2025.2.9",
 ]
 dev = [
+    "mypy>=1.18.2",
     "pre-commit>=4.3.0",
     "pyragify>=0.1.0",
+    "pyright>=1.1.405",
+    "pytest>=8.4.2",
+    "pytest-mypy>=1.0.1",
     "pytest-testinfra>=10.2.2",
+    "ruff>=0.13.1",
 ]
 lint = [
     "ruff>=0.11.2",
 ]
 
+[tool.pyright]
+include = ['\.py?$']
+exclude =  ['.venv']
+typeCheckingMode = 'strict'
+
+
+[tool.mypy]
+#include = ['.*\.py.?$']
+exclude =  ['\.venv']
+warn_return_any = false
+
+[tool.ruff]
+line-length = 79
+
 [tool.black]
 line-length = 79
-include = '\.pyi?$'
-
-#[tool.poetry]
-#name = "inventory"
-#version = "0.1.0"
-#description = ""
-#authors = ["xoneUpx <bobokuos@gmail.com>"]
-#readme = "README.md"
-
-#[tool.poetry.dependencies]
-#python = "^3.11"
-#pyyaml = "^6.0.1"
-#requests = "^2.31.0"
-
-
-#[tool.poetry.group.dev.dependencies]
-#black = "^23.7.0"
-#pytest = "^7.4.0"
-#pyyaml = "^6.0.1"
-#tox = "^4.9.0"
-#pre-commit = "^3.3.3"
-#pytest-testinfra = "^8.1.0"
-#mypy = "^1.5.1"
-#flake8 = "^6.1.0"
-#types-requests = "^2.31.0.2"
-
-#[build-system]
-#requires = ["poetry-core"]
-#build-backend = "poetry.core.masonry.api"
+include = '\.py\.?$'

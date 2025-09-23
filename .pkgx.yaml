@@ -1,4 +1,4 @@
 dependencies:
-  python.org@3.13.7 uv vagrant pre-commit
+  python.org@3.13.7 uv pre-commit gh glab
 env:
   TEST: python-dev
